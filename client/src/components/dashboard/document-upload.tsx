@@ -71,17 +71,6 @@ export default function DocumentUpload() {
       });
     },
     onError: (error) => {
-      if (isUnauthorizedError(error)) {
-        toast({
-          title: t("auth.unauthorized"),
-          description: t("auth.logging_in"),
-          variant: "destructive",
-        });
-        setTimeout(() => {
-          window.location.href = "/api/login";
-        }, 500);
-        return;
-      }
       toast({
         title: t("documents.upload_error"),
         description: error.message,
@@ -104,17 +93,6 @@ export default function DocumentUpload() {
       });
     },
     onError: (error) => {
-      if (isUnauthorizedError(error)) {
-        toast({
-          title: t("auth.unauthorized"),
-          description: t("auth.logging_in"),
-          variant: "destructive",
-        });
-        setTimeout(() => {
-          window.location.href = "/api/login";
-        }, 500);
-        return;
-      }
       toast({
         title: t("common.error"),
         description: t("documents.delete_error"),

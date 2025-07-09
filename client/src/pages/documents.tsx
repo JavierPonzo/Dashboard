@@ -32,24 +32,10 @@ export default function Documents() {
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState("all");
 
-  // Redirect to login if not authenticated
-  useEffect(() => {
-    if (!isLoading && !isAuthenticated) {
-      toast({
-        title: t("auth.unauthorized"),
-        description: t("auth.logging_in"),
-        variant: "destructive",
-      });
-      setTimeout(() => {
-        window.location.href = "/api/login";
-      }, 500);
-      return;
-    }
-  }, [isAuthenticated, isLoading, toast, t]);
+  // Authentication check disabled for demo mode
 
   const { data: documents = [], isLoading: documentsLoading } = useQuery({
     queryKey: ["/api/documents"],
-    enabled: isAuthenticated,
     retry: false,
   });
 
@@ -65,17 +51,6 @@ export default function Documents() {
       });
     },
     onError: (error) => {
-      if (isUnauthorizedError(error)) {
-        toast({
-          title: t("auth.unauthorized"),
-          description: t("auth.logging_in"),
-          variant: "destructive",
-        });
-        setTimeout(() => {
-          window.location.href = "/api/login";
-        }, 500);
-        return;
-      }
       toast({
         title: t("common.error"),
         description: t("documents.delete_error"),
@@ -139,9 +114,7 @@ export default function Documents() {
     );
   }
 
-  if (!isAuthenticated) {
-    return null;
-  }
+  // Authentication check disabled for demo mode
 
   return (
     <div className="flex h-screen overflow-hidden bg-gray-50">
