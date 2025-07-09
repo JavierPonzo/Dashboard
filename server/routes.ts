@@ -1,7 +1,7 @@
 import type { Express, Request, Response } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { setupAuth, isAuthenticated } from "./replitAuth";
+// import { setupAuth, isAuthenticated } from "./replitAuth"; // Temporarily disabled for demo
 import { upload, handleUploadError, extractTextFromFile, validateFile, getFileUrl } from "./middleware/upload";
 import { analyzeDocument, generateChatResponse, generateContract, runComplianceCheck } from "./services/openai";
 import { calculateComplianceScore, generateComplianceReport } from "./services/compliance";
@@ -18,22 +18,38 @@ if (!fs.existsSync(uploadsDir)) {
 }
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  // Auth middleware
-  await setupAuth(app);
+  // TEMPORARILY DISABLED AUTH - Create demo user for testing
+  const demoUser = {
+    id: "demo-user-123",
+    email: "demo@compliance.com",
+    firstName: "Demo",
+    lastName: "User",
+    profileImageUrl: null,
+    role: "user",
+    plan: "professional",
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  };
 
-  // Helper function to get audit context from request
+  // Ensure demo user exists in database
+  try {
+    await storage.upsertUser(demoUser);
+  } catch (error) {
+    console.log("Demo user already exists or error creating:", error);
+  }
+
+  // Helper function to get audit context from request (using demo user)
   const getAuditContext = (req: any) => ({
-    userId: req.user?.claims?.sub,
+    userId: demoUser.id,
     ipAddress: req.ip,
     userAgent: req.get("User-Agent"),
-    sessionId: req.sessionID,
+    sessionId: "demo-session",
   });
 
-  // Auth routes
-  app.get('/api/auth/user', isAuthenticated, async (req: any, res) => {
+  // Auth routes (bypassed for demo)
+  app.get('/api/auth/user', async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
-      const user = await storage.getUser(userId);
+      const user = await storage.getUser(demoUser.id);
       res.json(user);
     } catch (error) {
       console.error("Error fetching user:", error);
@@ -42,9 +58,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Document routes
-  app.post('/api/documents/upload', isAuthenticated, upload.array('files', 10), handleUploadError, async (req: any, res: Response) => {
+  app.post('/api/documents/upload', upload.array('files', 10), handleUploadError, async (req: any, res: Response) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = demoUser.id;
       const files = req.files as Express.Multer.File[];
       
       if (!files || files.length === 0) {
@@ -95,9 +111,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/documents', isAuthenticated, async (req: any, res) => {
+  app.get('/api/documents', async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = demoUser.id;
       const limit = parseInt(req.query.limit as string) || 10;
       
       const documents = await storage.getDocuments(userId, limit);
@@ -108,9 +124,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/documents/:id', isAuthenticated, async (req: any, res) => {
+  app.get('/api/documents/:id', async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = demoUser.id;
       const documentId = parseInt(req.params.id);
       
       const document = await storage.getDocument(documentId);
@@ -134,9 +150,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete('/api/documents/:id', isAuthenticated, async (req: any, res) => {
+  app.delete('/api/documents/:id', async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = demoUser.id;
       const documentId = parseInt(req.params.id);
       
       const document = await storage.getDocument(documentId);
@@ -170,9 +186,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // AI Chat routes
-  app.post('/api/chat', isAuthenticated, async (req: any, res) => {
+  app.post('/api/chat', async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = demoUser.id;
       const { message, sessionId } = req.body;
 
       if (!message || !sessionId) {
@@ -226,9 +242,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/chat/:sessionId', isAuthenticated, async (req: any, res) => {
+  app.get('/api/chat/:sessionId', async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = demoUser.id;
       const sessionId = req.params.sessionId;
       const limit = parseInt(req.query.limit as string) || 20;
       
@@ -241,9 +257,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Compliance routes
-  app.get('/api/compliance/score', isAuthenticated, async (req: any, res) => {
+  app.get('/api/compliance/score', async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = demoUser.id;
       const score = await calculateComplianceScore(userId);
       res.json(score);
     } catch (error) {
@@ -252,9 +268,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post('/api/compliance/check', isAuthenticated, async (req: any, res) => {
+  app.post('/api/compliance/check', async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = demoUser.id;
       const { content, complianceType = "gdpr" } = req.body;
 
       if (!content) {
@@ -278,9 +294,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/compliance/reports', isAuthenticated, async (req: any, res) => {
+  app.get('/api/compliance/reports', async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = demoUser.id;
       const reports = await storage.getComplianceReports(userId);
       res.json(reports);
     } catch (error) {
@@ -289,9 +305,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post('/api/compliance/generate-report', isAuthenticated, async (req: any, res) => {
+  app.post('/api/compliance/generate-report', async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = demoUser.id;
       const { reportType = "gdpr" } = req.body;
 
       await generateComplianceReport(userId, reportType);
@@ -312,9 +328,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Contract generation route
-  app.post('/api/contracts/generate', isAuthenticated, async (req: any, res) => {
+  app.post('/api/contracts/generate', async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = demoUser.id;
       const { contractType, requirements, jurisdiction = "Germany" } = req.body;
 
       if (!contractType || !requirements) {
@@ -339,9 +355,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Audit log routes
-  app.get('/api/audit-logs', isAuthenticated, async (req: any, res) => {
+  app.get('/api/audit-logs', async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = demoUser.id;
       const limit = parseInt(req.query.limit as string) || 20;
       
       const logs = await storage.getAuditLogs(userId, limit);
@@ -353,9 +369,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Statistics routes
-  app.get('/api/stats', isAuthenticated, async (req: any, res) => {
+  app.get('/api/stats', async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = demoUser.id;
       const stats = await storage.getUserStats(userId);
       res.json(stats);
     } catch (error) {
@@ -365,7 +381,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Serve uploaded files
-  app.get('/uploads/:filename', isAuthenticated, async (req: any, res) => {
+  app.get('/uploads/:filename', async (req: any, res) => {
     try {
       const filename = req.params.filename;
       const filePath = path.join(uploadsDir, filename);
@@ -375,7 +391,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Check if user has access to this file
-      const documents = await storage.getDocuments(req.user.claims.sub, 1000);
+      const documents = await storage.getDocuments(demoUser.id, 1000);
       const hasAccess = documents.some(doc => doc.fileName === filename);
       
       if (!hasAccess) {
