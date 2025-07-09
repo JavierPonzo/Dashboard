@@ -1,7 +1,7 @@
 import type { Express, Request, Response } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-// import { setupAuth, isAuthenticated } from "./replitAuth"; // Temporarily disabled for demo
+// import { setupAuth, isAuthenticated } from "./replitAuth";
 import { upload, handleUploadError, extractTextFromFile, validateFile, getFileUrl } from "./middleware/upload";
 import { analyzeDocument, generateChatResponse, generateContract, runComplianceCheck } from "./services/openai";
 import { calculateComplianceScore, generateComplianceReport } from "./services/compliance";
