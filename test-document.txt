@@ -1,0 +1,10 @@
+This is a test document for compliance and legal automation.
+
+Key features of our platform:
+- AI-powered document analysis
+- GDPR compliance monitoring
+- Legal contract generation
+- Audit trail management
+- Multi-language support
+
+This document can be used to test the upload functionality.
