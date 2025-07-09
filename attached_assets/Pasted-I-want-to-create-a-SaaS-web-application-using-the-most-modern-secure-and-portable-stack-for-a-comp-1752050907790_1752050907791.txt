@@ -1,0 +1,88 @@
+I want to create a SaaS web application using the most modern, secure, and portable stack for a compliance and legal automation platform in Europe (initially focused on Germany).
+
+Backend:
+
+Ruby on Rails (latest stable version, compatible with Ruby 3.3+ and easily upgradable to Rails 8).
+
+Configured as API-only.
+
+PostgreSQL database with migrations and seeds.
+
+Sidekiq for background jobs and ElastiCache-compatible Redis.
+
+Recommended gems for maximum security and compliance:
+
+Devise (authentication)
+
+Pundit (fine-grained authorization, user plans, and client scoping)
+
+Papertrail (audit logging)
+
+Lockbox or AttrEncrypted (field encryption)
+
+RSpec for testing
+
+ActiveStorage or Shrine for file management
+
+Environment variables managed via .env, never hardcoded.
+
+CORS support for a separate frontend.
+
+Frontend:
+
+React (Vite or Next.js), modular structure, ready for internationalization (i18n, at least English and German).
+
+Authentication via JWT or secure cookies, following OWASP best practices.
+
+UI built with TailwindCSS or Material UI.
+
+Embedded chat for AI assistant and human support.
+
+Dashboard must be modern, modular, and scalable (like Vanta), with:
+
+Sidebar navigation for products/modules.
+
+Strict access control: Each user can only view and use the products/modules assigned to their plan/role. Users cannot edit, add, or remove modules themselves.
+
+All user actions must be auditable.
+
+AI Integration:
+
+Code prepared for integrating APIs like OpenAI for legal document analysis/generation, automated recommendations, and AI chat.
+
+Code should be decoupled so AI can be migrated to a local instance in the future if required for compliance.
+
+Infrastructure:
+
+All code and configuration must be ready to migrate to AWS (Frankfurt/eu-central-1) with no Replit-specific dependencies.
+
+Provide Dockerfiles and deployment scripts to facilitate migration.
+
+Strict use of environment variables.
+
+Compliance & Security:
+
+All configuration must comply with GDPR/DSGVO and facilitate future ISO27001 certification—include audit logs, data encryption at rest and in transit, backup management, and access restricted by role.
+
+Do not store real or sensitive data on Replit.
+
+Prepare the stack for future integration with ticketing tools, calendar APIs, videochat, and microlearning modules.
+
+Portability:
+
+The project must be versioned in Git, with no proprietary Replit dependencies.
+
+All sensitive configuration via environment variables.
+
+Provide clear instructions for migrating the code and database to AWS, and deploying the frontend to S3 + CloudFront.
+
+Extras:
+
+Add README files with instructions for local setup and AWS migration.
+
+Structure the project for scalability, with well-organized folders and documentation for new developers.
+
+All permissions and dashboard views must be managed by the backend (not just frontend), to ensure security and compliance.
+
+Can you generate the project skeleton with these requirements and provide the files and steps necessary to start development?
+Please ensure that all security, access control, and portability best practices are implemented from the beginning.
